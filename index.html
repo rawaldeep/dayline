@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101f34">
+  <meta name="description" content="Your live companion for a day trip through Zaventem, Lier and Antwerp on 7 November 2026.">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preload" href="vendor/fonts/outfit-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="vendor/fonts/dm-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="styles.css">
+  <title>Dayline — Belgium, in a day</title>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner wrap">
+      <a class="brand" href="#plan" aria-label="Dayline home"><span class="brand-icon">d<span class="brand-spark">•</span></span><span>dayline<span class="brand-dot">.</span></span></a>
+      <div class="header-right"><span class="date-pill">SAT <strong>07 NOV '26</strong></span><span class="time-pill" id="local-clock" aria-label="Belgium local time">BE · --:--:--</span></div>
+    </div>
+  </header>
+
+  <main class="wrap" id="overview">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow light"><span class="signal-dot"></span> YOUR LIVE SATURDAY COMPANION</p>
+        <h1>Belgium,<br><em>in a day.</em></h1>
+        <p class="hero-sub">Your itinerary, live Belgian clock, GPS map, checklists and travel countdowns — all in one place.</p>
+        <div class="hero-tags"><span>London ⇄ Brussels</span><span>By car</span><span>Belgium time</span></div>
+      </div>
+      <div class="hero-side">
+        <div class="flight-path" aria-hidden="true"><span>BRU</span><span class="path-stroke"></span><span class="plane-emoji">✈</span><span class="path-stroke"></span><span>ANT</span></div>
+        <div class="countdown-label">TIME UNTIL RETURN FLIGHT</div>
+        <div class="hero-liveclock" aria-live="off"><span class="signal-dot"></span><span id="hero-clock">BELGIUM · --:--:--</span></div>
+        <div class="big-countdown" id="flight-countdown">--:--:--</div>
+        <div class="countdown-note" id="flight-countdown-note">SATURDAY · 21:10 CET</div>
+      </div>
+      <div class="hero-circle circle-one"></div><div class="hero-circle circle-two"></div>
+    </section>
+
+    <section class="quickstats" aria-label="Trip at a glance">
+      <div class="stat"><div class="stat-icon blue">↓</div><div><span class="stat-kicker">LAND IN BRUSSELS</span><strong>08:50 <small>CET</small></strong></div></div>
+      <div class="stat"><div class="stat-icon amber">↗</div><div><span class="stat-kicker">AIRPORT TARGET</span><strong>18:10 <small>CET</small></strong></div></div>
+      <div class="stat"><div class="stat-icon green">✓</div><div><span class="stat-kicker">STOPS DONE</span><strong id="progress-stat">0 <small>/ 8</small></strong></div></div>
+      <div class="stat"><div class="stat-icon pink">◷</div><div><span class="stat-kicker">LEAVE ANTWERP</span><strong>17:10 <small>CET</small></strong></div></div>
+    </section>
+
+    <nav class="tabs" aria-label="App sections">
+      <button class="tab active" data-tab="plan" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg><span>Itinerary</span></button>
+      <button class="tab" data-tab="map" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>Map</span></button>
+      <button class="tab" data-tab="flights" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 13.5 21 4l-4.5 16-5-5.5-3 3.5v-5L2.5 13.5z"/></svg><span>Flights</span></button>
+      <button class="tab" data-tab="checklist" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg><span>Checklist</span><span class="check-tab-count" id="todo-tab-count">0</span></button>
+    </nav>
+
+    <section class="pane active" id="pane-plan" aria-labelledby="heading-plan">
+      <div class="split-layout">
+        <div class="main-column">
+          <div class="section-head"><div><p class="eyebrow">THE GAME PLAN</p><h2 id="heading-plan">Your day, stop by stop<span class="period">.</span></h2></div><button id="reset-progress" class="text-button" type="button">↺ Reset</button></div>
+          <div class="control-bar"><label class="switch-row" for="lier-toggle"><span class="switch-text"><strong>Include Lier</strong><small>Optional stop · 20 minutes</small></span><span class="switch"><input id="lier-toggle" type="checkbox" checked><span class="switch-track"></span></span></label><span id="lier-advice" class="control-tip">Skip if the incoming flight is delayed.</span></div>
+          <div class="timeline" id="timeline"></div>
+        </div>
+        <aside class="side-column">
+          <section class="side-card next-card" aria-labelledby="next-title"><div class="side-heading"><span class="icon-square">⚡</span><span>UP NEXT</span></div><div id="next-stop-panel"><h3 id="next-title">Loading your next stop…</h3></div></section>
+          <section class="side-card timer-card" aria-labelledby="timer-title"><div class="side-heading"><span class="icon-square">⏱</span><span>20-MINUTE VISIT TIMER</span></div><h3 id="timer-title">Bisschoppenhoflaan</h3><p>Start this as you arrive. You’ll get a clear reminder when 20 minutes are up.</p><div class="timer-readout" id="stop-timer" aria-live="off">20:00</div><div class="timer-actions"><button class="btn-primary" id="timer-start" type="button">Start timer</button><button class="btn-outline" id="timer-reset" type="button">Reset</button></div><p class="fineprint" id="timer-hint">The deadline is saved even if you reload. Mobile browsers can pause background alerts, so also set a phone alarm.</p></section>
+          <section class="side-card caution-card"><div class="side-heading"><span class="icon-square">✈</span><span>DON'T MISS YOUR FLIGHT</span></div><p><strong>17:10</strong> — Latest planned departure from Antwerp.</p><p><strong>18:10</strong> — Target arrival at Brussels Airport.</p><p>London is non-Schengen: allow for security <em>and</em> exit passport control. Road traffic is not tracked live.</p><button class="btn-link" id="go-flights" type="button">Open flight tracker ↗</button></section>
+        </aside>
+      </div>
+    </section>
+
+    <section class="pane" id="pane-map" aria-labelledby="heading-map" hidden>
+      <div class="section-head"><div><p class="eyebrow">FIND YOUR WAY</p><h2 id="heading-map">Every stop, on one map<span class="period">.</span></h2></div></div>
+      <div class="map-toolbar">
+        <label class="map-style-label" for="map-style"><span>Style</span><select id="map-style" aria-label="Choose map style"><option value="liberty">Streets</option><option value="bright">Bright</option><option value="positron">Light</option><option value="osm">Classic (OSM)</option></select></label>
+        <div class="map-toolbar-buttons">
+          <button class="btn-outline small" id="map-fit" type="button">Fit all</button>
+          <button class="btn-outline small" id="map-antwerp" type="button">Antwerp</button>
+          <button class="btn-primary small" id="gps-button" type="button">⌖ My location</button>
+        </div>
+      </div>
+      <div class="map-frame">
+        <div id="map" role="region" aria-label="Interactive map of your trip"></div>
+        <div id="map-error" class="map-error" role="alert" hidden><strong>The map couldn’t load.</strong><p>Your addresses and directions links still work below.</p><button id="map-retry" class="btn-primary small" type="button">Retry map</button></div>
+        <div class="map-float"><span class="live-dot"></span><span id="map-status">Loading map…</span></div>
+      </div>
+      <p class="map-disclaimer">Numbered pins show the <strong>order of stops</strong>; the dotted line is a straight sketch, <strong>not a road route</strong>. Tap <strong>Directions</strong> for turn-by-turn navigation in Google Maps. Pin positions are looked up from the street addresses and remembered on this device; until then they’re approximate. Map tiles need internet.</p>
+      <div class="map-stop-list" id="map-stops"></div>
+    </section>
+
+    <section class="pane" id="pane-flights" aria-labelledby="heading-flights" hidden>
+      <div class="section-head"><div><p class="eyebrow">FLIGHT WATCH</p><h2 id="heading-flights">Keep an eye on the skies<span class="period">.</span></h2></div></div>
+      <div class="flight-grid">
+        <section class="flight-box"><div class="flight-box-head"><span class="flight-type">01 / ARRIVAL</span><span class="flight-tag">08:50 CET</span></div><div class="airports"><span>ORIGIN</span><div class="flight-mid">✈</div><span>BRU</span></div><h3>Morning arrival</h3><label for="flight-inbound">Flight number <small>(e.g. SN1234)</small></label><input id="flight-inbound" placeholder="Enter flight number" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="9"><div class="flight-links"><button class="btn-primary external-flight" data-flight="inbound" data-site="fa" type="button">FlightAware ↗</button><button class="btn-outline external-flight" data-flight="inbound" data-site="fr" type="button">Flightradar24 ↗</button></div><p class="flight-hint" id="flight-inbound-hint">Add your incoming flight number, then open a live tracker.</p></section>
+        <section class="flight-box"><div class="flight-box-head"><span class="flight-type">02 / DEPARTURE</span><span class="flight-tag pink-tag">21:10 CET</span></div><div class="airports"><span>BRU</span><div class="flight-mid">✈</div><span>LONDON</span></div><h3>Brussels Airlines return</h3><label for="flight-outbound">Flight number <small>(e.g. SN1234)</small></label><input id="flight-outbound" placeholder="Enter SN flight number" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="9"><div class="flight-links"><button class="btn-primary external-flight" data-flight="outbound" data-site="fa" type="button">FlightAware ↗</button><button class="btn-outline external-flight" data-flight="outbound" data-site="fr" type="button">Flightradar24 ↗</button></div><p class="flight-hint" id="flight-outbound-hint">Add your outgoing flight number, then open a live tracker.</p></section>
+      </div>
+      <div class="flight-alert"><span>ⓘ</span><div><strong>About flight status</strong><p>Dayline has no server, so it can’t fetch live status itself. It saves your flight numbers on this device and opens them in FlightAware or Flightradar24 with one tap. The 08:50 and 21:10 times shown are your plan, not live data. For boarding and gate decisions, trust the airport screens and Brussels Airlines.</p></div></div>
+    </section>
+
+    <section class="pane" id="pane-checklist" aria-labelledby="heading-checklist" hidden>
+      <div class="section-head"><div><p class="eyebrow">NOTHING LEFT BEHIND</p><h2 id="heading-checklist">Ready, set, go<span class="period">.</span></h2></div><span class="checklist-summary" id="checklist-summary">0 / 0 complete</span></div>
+      <div class="check-progress-track"><div id="check-progress-fill"></div></div>
+      <div id="checklist-groups" class="checklist-groups"></div>
+      <p class="autosave-note">✓ Your progress, flight numbers, Lier choice and checklists are saved on this device.</p>
+    </section>
+
+    <footer><div class="footer-brand">dayline<span>.</span></div><p>Saturday 07 Nov 2026 · All times Brussels local (CET) · Map data © OpenStreetMap contributors, tiles by OpenFreeMap.</p><a href="https://www.brusselsairlines.com/" target="_blank" rel="noopener noreferrer">Brussels Airlines ↗</a></footer>
+  </main>
+  <div class="toast" role="status" id="toast" aria-live="polite"></div>
+  <script src="vendor/maplibre-gl.js"></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
